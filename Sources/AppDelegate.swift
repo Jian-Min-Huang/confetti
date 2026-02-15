@@ -27,8 +27,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             scene.scaleMode = .resizeFill
             skView.presentScene(scene)
 
+            window.alphaValue = 0          // Start hidden to avoid initial flash
             window.orderFrontRegardless()
             windows.append(window)
+        }
+
+        // Reveal windows after first frame renders to avoid flash (Bug #1)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
+            self?.windows.forEach { $0.alphaValue = 1 }
         }
 
         // Activate to receive keyboard events

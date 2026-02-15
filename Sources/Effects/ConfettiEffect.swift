@@ -61,12 +61,12 @@ final class ConfettiEffect: ParticleEffect {
             node.position = CGPoint(x: startX, y: startY)
 
             let targetH = CGFloat.random(in: 0.7...0.9) * sceneSize.height
-            let gravity: CGFloat = 1200
+            let gravity: CGFloat = 400
             let vyNeeded = sqrt(2 * gravity * targetH)
             let vy = vyNeeded * CGFloat.random(in: 0.95...1.05)
             let vx: CGFloat = fromLeft
-                ? CGFloat.random(in: 250...550)
-                : CGFloat.random(in: -550 ... -250)
+                ? CGFloat.random(in: 500...900)
+                : CGFloat.random(in: -900 ... -500)
 
             let p = Particle(
                 node: node,
@@ -95,7 +95,7 @@ final class ConfettiEffect: ParticleEffect {
         let elapsed = currentTime - startTime
         let speed = CGFloat(config.speed)
         let adt = CGFloat(dt) * speed   // adjusted delta time
-        let gravity: CGFloat = 1200
+        let gravity: CGFloat = 400
 
         for i in particles.indices {
             // Spawn check
