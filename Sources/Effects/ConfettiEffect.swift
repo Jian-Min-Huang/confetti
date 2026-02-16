@@ -94,7 +94,11 @@ final class ConfettiEffect: ParticleEffect {
         if !started { startTime = currentTime; started = true }
         let elapsed = currentTime - startTime
         let speed = CGFloat(config.speed)
-        let adt = CGFloat(dt) * speed   // adjusted delta time
+
+        // Ease-out speed curve: fast initial (1.8x) → slow tail (0.5x)
+        let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
+        let speedCurve: CGFloat = 0.5 + 1.3 * pow(1.0 - progress, 2)
+        let adt = CGFloat(dt) * speed * speedCurve   // adjusted delta time
         let gravity: CGFloat = 100
 
         for i in particles.indices {

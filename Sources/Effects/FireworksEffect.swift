@@ -16,6 +16,8 @@ final class FireworksEffect: ParticleEffect {
         let startX: CGFloat
         var isLaunched: Bool = false
         var hasExploded: Bool = false
+        var launchedTime: TimeInterval = 0   // actual time when launched
+        let flightDuration: TimeInterval = 1.0 // estimated flight time for speed curve
     }
 
     private struct Spark {
@@ -82,9 +84,9 @@ final class FireworksEffect: ParticleEffect {
         if !started { startTime = currentTime; started = true }
         let elapsed = currentTime - startTime
         let speed = CGFloat(config.speed)
-        let adt = CGFloat(dt) * speed
+        let baseDt = CGFloat(dt) * speed
 
-        // --- Rockets ---
+        // --- Rockets --- (each rocket uses its own speed curve based on individual flight age)
         for i in rockets.indices {
             if rockets[i].hasExploded { continue }
 
@@ -92,14 +94,21 @@ final class FireworksEffect: ParticleEffect {
             if !rockets[i].isLaunched {
                 guard elapsed >= rockets[i].launchTime else { continue }
                 rockets[i].isLaunched = true
+                rockets[i].launchedTime = currentTime
                 rockets[i].node.alpha = 1
             }
 
+            // Per-rocket ease-out speed curve: fast at launch → slow near explosion
+            let rocketAge = CGFloat(currentTime - rockets[i].launchedTime)
+            let rocketProgress = min(1.0, rocketAge / CGFloat(rockets[i].flightDuration))
+            let rocketSpeedCurve: CGFloat = 0.5 + 1.3 * pow(1.0 - rocketProgress, 2)
+            let rAdt = baseDt * rocketSpeedCurve
+
             // Rise
-            rockets[i].node.position.y += rockets[i].vy * adt
+            rockets[i].node.position.y += rockets[i].vy * rAdt
 
             // Slight deceleration
-            rockets[i].vy -= 100 * adt
+            rockets[i].vy -= 100 * rAdt
 
             // Explode when reaching target height
             if rockets[i].node.position.y >= rockets[i].targetHeight {
@@ -109,21 +118,26 @@ final class FireworksEffect: ParticleEffect {
             }
         }
 
-        // --- Sparks ---
+        // --- Sparks --- (each spark uses its own speed curve based on individual age)
         let gravity: CGFloat = 300
         for i in sparks.indices.reversed() {
-            let age = CGFloat(currentTime - sparks[i].birthTime) * speed
+            let sparkAge = CGFloat(currentTime - sparks[i].birthTime)
             let lifetime = CGFloat(sparks[i].lifetime)
 
-            sparks[i].vy -= gravity * adt
-            sparks[i].node.position.x += sparks[i].vx * adt
-            sparks[i].node.position.y += sparks[i].vy * adt
+            // Per-spark ease-out speed curve: fast at explosion → slow as fading
+            let sparkProgress = min(1.0, sparkAge / lifetime)
+            let sparkSpeedCurve: CGFloat = 0.5 + 1.3 * pow(1.0 - sparkProgress, 2)
+            let sAdt = baseDt * sparkSpeedCurve
+
+            sparks[i].vy -= gravity * sAdt
+            sparks[i].node.position.x += sparks[i].vx * sAdt
+            sparks[i].node.position.y += sparks[i].vy * sAdt
 
             // Decelerate horizontally (air drag)
-            sparks[i].vx *= (1.0 - 1.5 * adt)
+            sparks[i].vx *= (1.0 - 1.5 * sAdt)
 
             // Fade based on age
-            let lifeRatio = age / lifetime
+            let lifeRatio = sparkAge * CGFloat(speed) / lifetime
             sparks[i].node.alpha = max(0, 1 - lifeRatio)
 
             // Remove dead sparks
