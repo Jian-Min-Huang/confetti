@@ -26,6 +26,7 @@ swift package clean
 ```
 
 **Platform Requirements:**
+
 - macOS 13.0+ (specified in Package.swift)
 - Swift 5.9+
 - No external dependencies or Xcode project required
@@ -34,7 +35,7 @@ swift package clean
 
 ### Core Components Flow
 
-```
+```plain
 main.swift
   ↓ parses CLI args
 Config.parse()
@@ -48,20 +49,20 @@ ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect)
 
 ### Key Design Patterns
 
-**1. Protocol-Based Effect System**
-- All effects implement `ParticleEffect` protocol with `setup()` and `update()` methods
-- `ParticleScene.createEffect()` acts as factory, mapping `EffectStyle` enum to concrete implementations
-- Add new effects by: creating effect class → adding enum case → updating factory switch
+- Protocol-Based Effect System
+  - All effects implement `ParticleEffect` protocol with `setup()` and `update()` methods
+  - `ParticleScene.createEffect()` acts as factory, mapping `EffectStyle` enum to concrete implementations
+  - Add new effects by: creating effect class → adding enum case → updating factory switch
 
-**2. Multi-Screen Architecture**
-- `AppDelegate` creates one `OverlayWindow` + `ParticleScene` per `NSScreen`
-- Each scene runs its own effect instance independently
-- All windows use `.screenSaver` level to appear above everything
+- Multi-Screen Architecture
+  - `AppDelegate` creates one `OverlayWindow` + `ParticleScene` per `NSScreen`
+  - Each scene runs its own effect instance independently
+  - All windows use `.screenSaver` level to appear above everything
 
-**3. Click-Through Overlay**
-- `OverlayWindow` sets `ignoresMouseEvents = true` for click-through (FR-4)
-- Window uses `.borderless` style and `level = .screenSaver` to float above all apps (FR-3)
-- App uses `.accessory` activation policy to hide from Dock/menu bar (FR-2)
+- Click-Through Overlay
+  - `OverlayWindow` sets `ignoresMouseEvents = true` for click-through (FR-4)
+  - Window uses `.borderless` style and `level = .screenSaver` to float above all apps (FR-3)
+  - App uses `.accessory` activation policy to hide from Dock/menu bar (FR-2)
 
 ### Effect Implementation Structure
 
@@ -104,13 +105,13 @@ final class YourEffect: ParticleEffect {
 
 Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 
-| Parameter    | Type            | Default       | Notes                              |
-| ------------ | --------------- | ------------- | ---------------------------------- |
-| `--style`    | `EffectStyle`   | `confetti`    | confetti, falling-leaves, fireworks |
-| `--emojis`   | String of emojis | `🎉⚽❤️`      | Parsed into array of single chars  |
-| `--density`  | `Density`       | `medium`      | Maps to particleCount: 50/100/200  |
-| `--speed`    | Double          | `1.0`         | Animation speed multiplier         |
-| `--duration` | Double          | `5.0`         | Auto-terminate after duration + 0.5s |
+| Parameter    | Type             | Default    | Notes                                |
+| ------------ | ---------------- | ---------- | ------------------------------------ |
+| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks  |
+| `--emojis`   | String of emojis | `🎉⚽❤️`   | Parsed into array of single chars    |
+| `--density`  | `Density`        | `medium`   | Maps to particleCount: 50/100/200    |
+| `--speed`    | Double           | `1.0`      | Animation speed multiplier           |
+| `--duration` | Double           | `5.0`      | Auto-terminate after duration + 0.5s |
 
 ## Important Implementation Notes
 
@@ -130,6 +131,7 @@ DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
 ### Physics Parameter Tuning
 
 **Confetti Effect** (Bug #2 fixed - arc flattened):
+
 - Launch gravity: 100 (was 400)
 - Target height: 50%-95% screen (was 70%-90%)
 - Velocity boost: 1.30-1.50x (was 0.95-1.05x)
@@ -140,6 +142,7 @@ These create a flatter arc trajectory as specified in [BUG_zh.md](BUG_zh.md).
 ### Auto-Termination
 
 App terminates via two mechanisms:
+
 1. **Duration-based:** `DispatchQueue.main.asyncAfter(config.duration + 0.5)` in AppDelegate
 2. **User-triggered:** Esc key (keyCode 53) monitored in AppDelegate
 
@@ -151,7 +154,7 @@ App terminates via two mechanisms:
 
 ## Code References
 
-All code includes functional requirement (FR-*) and non-functional requirement (NFR-*) comments matching [SPEC_zh.md](SPEC_zh.md). Use these to understand the purpose of each section.
+All code includes functional requirement (FR-_) and non-functional requirement (NFR-_) comments matching [SPEC_zh.md](SPEC_zh.md). Use these to understand the purpose of each section.
 
 ## Adding New Effects
 
