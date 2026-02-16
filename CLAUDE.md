@@ -86,7 +86,10 @@ final class YourEffect: ParticleEffect {
     }
 
     func update(currentTime: TimeInterval, deltaTime dt: TimeInterval) {
-        // Apply config.speed to deltaTime: let adt = CGFloat(dt) * CGFloat(config.speed)
+        // Apply easing-based speed curve:
+        // let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
+        // let speedCurve = config.easing.speedMultiplier(at: progress)
+        // let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
         // Update particle physics/positions
         // Handle fade-out near config.duration
     }
@@ -96,7 +99,12 @@ final class YourEffect: ParticleEffect {
 **Critical Implementation Details:**
 
 - Use `config.density.particleCount` for particle count (low: 50, medium: 100, high: 200)
-- Apply speed multiplier: `let adt = CGFloat(dt) * CGFloat(config.speed)`
+- Apply easing-based speed curve:
+  ```swift
+  let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
+  let speedCurve = config.easing.speedMultiplier(at: progress)
+  let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
+  ```
 - Create emoji textures with `EmojiTexture.create(emoji: String)`
 - Fade particles near end: `if elapsed > config.duration - 0.5 { ... }`
 - Set initial `node.alpha = 0` to prevent flash, reveal on spawn
@@ -105,13 +113,14 @@ final class YourEffect: ParticleEffect {
 
 Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 
-| Parameter    | Type             | Default    | Notes                                |
-| ------------ | ---------------- | ---------- | ------------------------------------ |
-| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks  |
-| `--emojis`   | String of emojis | `🎉⚽❤️`   | Parsed into array of single chars    |
-| `--density`  | `Density`        | `medium`   | Maps to particleCount: 50/100/200    |
-| `--speed`    | Double           | `1.0`      | Animation speed multiplier           |
-| `--duration` | Double           | `5.0`      | Auto-terminate after duration + 0.5s |
+| Parameter    | Type             | Default    | Notes                                  |
+| ------------ | ---------------- | ---------- | -------------------------------------- |
+| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks    |
+| `--emojis`   | String of emojis | `🎉⚽❤️`   | Parsed into array of single chars      |
+| `--density`  | `Density`        | `medium`   | Maps to particleCount: 50/100/200      |
+| `--speed`    | Double           | `1.0`      | Animation speed multiplier             |
+| `--easing`   | `EasingType`     | `ease-out` | linear, ease-in, ease-out, ease-in-out |
+| `--duration` | Double           | `5.0`      | Auto-terminate after duration + 0.5s   |
 
 ## Important Implementation Notes
 
@@ -138,6 +147,42 @@ DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
 - Horizontal velocity: 100-1000 (was 500-900)
 
 These create a flatter arc trajectory as specified in [BUG_zh.md](BUG_zh.md).
+
+### Easing Functions (FR-8, FR-13, FR-19)
+
+Easing functions control the animation speed curve over time, making particle motion feel more natural. The implementation uses **speed multipliers** derived from the first derivative of standard easing curves.
+
+**Mathematical Implementation** ([Config.swift](Sources/Config.swift):23-38):
+
+```swift
+func speedMultiplier(at progress: CGFloat) -> CGFloat {
+    let t = min(max(progress, 0), 1)  // clamp to [0,1]
+    switch self {
+    case .linear:
+        return 1.0                     // constant speed
+    case .easeIn:
+        return 2.0 * t                 // f(t)=t²  → f'(t)=2t
+    case .easeOut:
+        return 2.0 * (1.0 - t)         // f(t)=2t−t² → f'(t)=2(1−t)
+    case .easeInOut:
+        return 6.0 * t * (1.0 - t)     // f(t)=3t²−2t³ → f'(t)=6t(1−t)
+    }
+}
+```
+
+**Usage in Effects** (see [ConfettiEffect.swift](Sources/Effects/ConfettiEffect.swift):98-101):
+
+```swift
+let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
+let speedCurve = config.easing.speedMultiplier(at: progress)
+let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
+```
+
+**Key Properties:**
+
+- All curves integrate to 1.0 over [0,1], preserving total animation distance
+- `ease-out` (default) creates natural deceleration, ideal for settling effects
+- `ease-in-out` creates smooth acceleration/deceleration, used in both rocket launch and spark explosion phases in fireworks effect
 
 ### Auto-Termination
 

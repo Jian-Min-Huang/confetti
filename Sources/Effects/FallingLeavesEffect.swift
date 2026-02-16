@@ -73,7 +73,11 @@ final class FallingLeavesEffect: ParticleEffect {
         if !started { startTime = currentTime; started = true }
         let elapsed = currentTime - startTime
         let speed = CGFloat(config.speed)
-        let adt = CGFloat(dt) * speed
+
+        // FR-8: easing-based speed curve
+        let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
+        let speedCurve = config.easing.speedMultiplier(at: progress, exponent: CGFloat(config.easingExponent))
+        let adt = CGFloat(dt) * speed * speedCurve
 
         for i in leaves.indices {
             if !leaves[i].isSpawned {

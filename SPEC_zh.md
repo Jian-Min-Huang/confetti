@@ -8,27 +8,30 @@ Confetti.app 是一個 macOS 命令列原生應用，以透明覆蓋層的形式
 
 ### 2.1 功能需求
 
-| ID    | 需求                                                         |
-| ----- | ------------------------------------------------------------ |
-| FR-1  | 透過 `open Confetti.app` 啟動，無需額外設定                  |
-| FR-2  | 不顯示 Dock 圖示，不顯示選單列                               |
-| FR-3  | 在所有視窗之上顯示全螢幕透明覆蓋層                           |
-| FR-4  | 覆蓋層必須能穿透點擊，所有滑鼠事件傳遞至底層視窗             |
-| FR-5  | 支援多螢幕，每個螢幕各自播放動畫                             |
-| FR-6  | 使用多種 Emoji 作為動畫粒子，預設為 `🎉⚽❤️`                 |
-| FR-7  | 支援多種特效樣式：`confetti`、`falling-leaves`、`fireworks`  |
-| FR-8  | 接受 `--style <name>` 參數選擇特效樣式                       |
-| FR-9  | 接受 `--emojis <list>` 參數自訂粒子 Emoji                    |
-| FR-10 | 接受 `--density <level>` 參數控制粒子密度（low/medium/high） |
-| FR-11 | 接受 `--speed <multiplier>` 參數調整動畫速度                 |
-| FR-12 | 接受 `--duration <seconds>` 參數控制特效播放時間             |
-| FR-13 | `--style` 預設值為 `confetti`                                |
-| FR-14 | `--emojis` 預設值為 `🎉⚽❤️`                                 |
-| FR-15 | `--density` 預設值為 `medium`                                |
-| FR-16 | `--speed` 預設值為 `1.0`                                     |
-| FR-17 | `--duration` 預設值為 `5` 秒                                 |
-| FR-18 | 動畫結束後自動終止                                           |
-| FR-19 | 支援按 `Esc` 鍵提前結束動畫                                  |
+| ID    | 需求                                                                 |
+| ----- | -------------------------------------------------------------------- |
+| FR-1  | 透過 `open Confetti.app` 啟動，無需額外設定                          |
+| FR-2  | 不顯示 Dock 圖示，不顯示選單列                                       |
+| FR-3  | 在所有視窗之上顯示全螢幕透明覆蓋層                                   |
+| FR-4  | 覆蓋層必須能穿透點擊，所有滑鼠事件傳遞至底層視窗                     |
+| FR-5  | 支援多螢幕，每個螢幕各自播放動畫                                     |
+| FR-6  | 使用多種 Emoji 作為動畫粒子，預設為 `🎉⚽❤️`                         |
+| FR-7  | 支援多種特效樣式：`confetti`、`falling-leaves`、`fireworks`          |
+| FR-8  | 支援多種 Easing 函數：`linear`、`ease-in`、`ease-out`、`ease-in-out` |
+| FR-9  | 接受 `--style <name>` 參數選擇特效樣式                               |
+| FR-10 | 接受 `--emojis <list>` 參數自訂粒子 Emoji                            |
+| FR-11 | 接受 `--density <level>` 參數控制粒子密度（low/medium/high）         |
+| FR-12 | 接受 `--speed <multiplier>` 參數調整動畫速度                         |
+| FR-13 | 接受 `--easing <type>` 參數控制動畫速度曲線                          |
+| FR-14 | 接受 `--duration <seconds>` 參數控制特效播放時間                     |
+| FR-15 | `--style` 預設值為 `confetti`                                        |
+| FR-16 | `--emojis` 預設值為 `🎉⚽❤️`                                         |
+| FR-17 | `--density` 預設值為 `medium`                                        |
+| FR-18 | `--speed` 預設值為 `1.0`                                             |
+| FR-19 | `--easing` 預設值為 `ease-out`                                       |
+| FR-20 | `--duration` 預設值為 `5` 秒                                         |
+| FR-21 | 動畫結束後自動終止                                                   |
+| FR-22 | 支援按 `Esc` 鍵提前結束動畫                                          |
 
 #### 2.1.1 特效樣式定義
 

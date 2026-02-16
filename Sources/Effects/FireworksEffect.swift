@@ -10,14 +10,14 @@ final class FireworksEffect: ParticleEffect {
 
     private struct Rocket {
         let node: SKSpriteNode
-        var vy: CGFloat
+        let startY: CGFloat
         let targetHeight: CGFloat
         let launchTime: TimeInterval
         let startX: CGFloat
+        let flightDuration: TimeInterval     // derived from distance / base velocity
         var isLaunched: Bool = false
         var hasExploded: Bool = false
         var launchedTime: TimeInterval = 0   // actual time when launched
-        let flightDuration: TimeInterval = 1.0 // estimated flight time for speed curve
     }
 
     private struct Spark {
@@ -48,8 +48,6 @@ final class FireworksEffect: ParticleEffect {
         let rocketCount = Int.random(in: 3...5)
         let rocketTexture = EmojiTexture.create(emoji: config.emojis[0], size: 32)
 
-        // Stagger launches over first 60 % of duration
-        let launchWindow = config.duration * 0.6
         // Spread X positions evenly with jitter to avoid overlap
         let segmentWidth = sceneSize.width / CGFloat(rocketCount + 1)
 
@@ -60,17 +58,21 @@ final class FireworksEffect: ParticleEffect {
 
             let baseX = segmentWidth * CGFloat(i + 1)
             let startX = baseX + CGFloat.random(in: -segmentWidth * 0.25 ... segmentWidth * 0.25)
-            node.position = CGPoint(x: startX, y: -20)
+            let startY: CGFloat = -20
+            node.position = CGPoint(x: startX, y: startY)
 
             let targetH = CGFloat.random(in: 0.7...0.9) * sceneSize.height
+            let baseVelocity = CGFloat.random(in: 700...1000)
+            let distance = targetH - startY
+            let flightTime = Double(distance / baseVelocity)
 
             let rocket = Rocket(
                 node: node,
-                vy: CGFloat.random(in: 700...1000),
+                startY: startY,
                 targetHeight: targetH,
-                launchTime: Double(i) / Double(rocketCount) * launchWindow
-                    + Double.random(in: 0...launchWindow * 0.15),
-                startX: startX
+                launchTime: 0,
+                startX: startX,
+                flightDuration: flightTime
             )
 
             scene.addChild(node)
@@ -98,20 +100,19 @@ final class FireworksEffect: ParticleEffect {
                 rockets[i].node.alpha = 1
             }
 
-            // Per-rocket ease-out speed curve: fast at launch → slow near explosion
-            let rocketAge = CGFloat(currentTime - rockets[i].launchedTime)
-            let rocketProgress = min(1.0, rocketAge / CGFloat(rockets[i].flightDuration))
-            let rocketSpeedCurve: CGFloat = 0.5 + 1.3 * pow(1.0 - rocketProgress, 2)
-            let rAdt = baseDt * rocketSpeedCurve
+            // FR-8: per-rocket easing via position interpolation.
+            // Uses the easing position curve to place the rocket directly,
+            // guaranteeing it reaches targetHeight in exactly flightDuration.
+            let rocketAge = (currentTime - rockets[i].launchedTime) * Double(speed)
+            let rocketProgress = min(1.0, CGFloat(rocketAge / rockets[i].flightDuration))
+            let easedProgress = config.easing.position(at: rocketProgress, exponent: CGFloat(config.easingExponent))
 
-            // Rise
-            rockets[i].node.position.y += rockets[i].vy * rAdt
+            let startY = rockets[i].startY
+            let distance = rockets[i].targetHeight - startY
+            rockets[i].node.position.y = startY + distance * easedProgress
 
-            // Slight deceleration
-            rockets[i].vy -= 100 * rAdt
-
-            // Explode when reaching target height
-            if rockets[i].node.position.y >= rockets[i].targetHeight {
+            // Explode when flight completes
+            if rocketProgress >= 1.0 {
                 explode(rocket: rockets[i], at: currentTime, in: rockets[i].node.scene!)
                 rockets[i].hasExploded = true
                 rockets[i].node.removeFromParent()
@@ -124,9 +125,9 @@ final class FireworksEffect: ParticleEffect {
             let sparkAge = CGFloat(currentTime - sparks[i].birthTime)
             let lifetime = CGFloat(sparks[i].lifetime)
 
-            // Per-spark ease-out speed curve: fast at explosion → slow as fading
+            // FR-8: per-spark easing speed curve
             let sparkProgress = min(1.0, sparkAge / lifetime)
-            let sparkSpeedCurve: CGFloat = 0.5 + 1.3 * pow(1.0 - sparkProgress, 2)
+            let sparkSpeedCurve = config.easing.speedMultiplier(at: sparkProgress, exponent: CGFloat(config.easingExponent))
             let sAdt = baseDt * sparkSpeedCurve
 
             sparks[i].vy -= gravity * sAdt
