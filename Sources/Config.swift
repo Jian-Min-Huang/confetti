@@ -84,9 +84,9 @@ enum Density: String {
 
     var particleCount: Int {
         switch self {
-        case .low:    return 50
-        case .medium: return 100
-        case .high:   return 200
+        case .low:    return 100
+        case .medium: return 200
+        case .high:   return 300
         }
     }
 }

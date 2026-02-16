@@ -134,8 +134,10 @@ final class FireworksEffect: ParticleEffect {
             sparks[i].node.position.x += sparks[i].vx * sAdt
             sparks[i].node.position.y += sparks[i].vy * sAdt
 
-            // Decelerate horizontally (air drag)
-            sparks[i].vx *= (1.0 - 1.5 * sAdt)
+            // Decelerate symmetrically (air drag) to preserve circular explosion shape
+            let drag = 1.0 - 1.5 * sAdt
+            sparks[i].vx *= drag
+            sparks[i].vy *= drag
 
             // Fade based on age
             let lifeRatio = sparkAge * CGFloat(speed) / lifetime
