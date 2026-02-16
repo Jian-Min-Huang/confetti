@@ -94,8 +94,8 @@ enum Density: String {
 // MARK: - Config (FR-9 ~ FR-20)
 
 struct Config {
-    var style: EffectStyle = .confetti       // FR-15
-    var emojis: [String] = ["🎉", "⚽", "❤️"] // FR-16
+    var style: EffectStyle = .confetti        // FR-15
+    var emojis: [String] = ["🎉", "🎊", "✨"]  // FR-16
     var density: Density = .medium            // FR-17
     var speed: Double = 1.0                   // FR-18
     var easing: EasingType = .easeOut         // FR-19

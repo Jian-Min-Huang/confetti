@@ -116,11 +116,17 @@ Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 | Parameter    | Type             | Default    | Notes                                  |
 | ------------ | ---------------- | ---------- | -------------------------------------- |
 | `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks    |
-| `--emojis`   | String of emojis | `🎉⚽❤️`   | Parsed into array of single chars      |
-| `--density`  | `Density`        | `medium`   | Maps to particleCount: 50/100/200      |
+| `--emojis`   | String of emojis | `🎉🎊✨`   | Parsed into array of single chars      |
+| `--density`  | `Density`        | `high`     | Maps to particleCount: 50/100/200      |
 | `--speed`    | Double           | `1.0`      | Animation speed multiplier             |
 | `--easing`   | `EasingType`     | `ease-out` | linear, ease-in, ease-out, ease-in-out |
 | `--duration` | Double           | `5.0`      | Auto-terminate after duration + 0.5s   |
+
+Internal hard-coded parameters (not exposed as CLI arguments):
+
+| Property         | Type   | Default | Notes                                                         |
+| ---------------- | ------ | ------- | ------------------------------------------------------------- |
+| `easingExponent` | Double | `3.0`   | Easing curve order: 2=quadratic, 3=cubic, higher=more extreme |
 
 ## Important Implementation Notes
 

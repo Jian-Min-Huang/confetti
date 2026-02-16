@@ -15,7 +15,7 @@ Confetti.app 是一個 macOS 命令列原生應用，以透明覆蓋層的形式
 | FR-3  | 在所有視窗之上顯示全螢幕透明覆蓋層                                   |
 | FR-4  | 覆蓋層必須能穿透點擊，所有滑鼠事件傳遞至底層視窗                     |
 | FR-5  | 支援多螢幕，每個螢幕各自播放動畫                                     |
-| FR-6  | 使用多種 Emoji 作為動畫粒子，預設為 `🎉⚽❤️`                         |
+| FR-6  | 使用多種 Emoji 作為動畫粒子，預設為 `🎉🎊✨`                         |
 | FR-7  | 支援多種特效樣式：`confetti`、`falling-leaves`、`fireworks`          |
 | FR-8  | 支援多種 Easing 函數：`linear`、`ease-in`、`ease-out`、`ease-in-out` |
 | FR-9  | 接受 `--style <name>` 參數選擇特效樣式                               |
@@ -25,7 +25,7 @@ Confetti.app 是一個 macOS 命令列原生應用，以透明覆蓋層的形式
 | FR-13 | 接受 `--easing <type>` 參數控制動畫速度曲線                          |
 | FR-14 | 接受 `--duration <seconds>` 參數控制特效播放時間                     |
 | FR-15 | `--style` 預設值為 `confetti`                                        |
-| FR-16 | `--emojis` 預設值為 `🎉⚽❤️`                                         |
+| FR-16 | `--emojis` 預設值為 `🎉🎊✨`                                         |
 | FR-17 | `--density` 預設值為 `medium`                                        |
 | FR-18 | `--speed` 預設值為 `1.0`                                             |
 | FR-19 | `--easing` 預設值為 `ease-out`                                       |
