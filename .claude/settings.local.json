@@ -3,7 +3,8 @@
     "allow": [
       "Bash(swift build:*)",
       "Bash(make install:*)",
-      "Bash(open:*)"
+      "Bash(open:*)",
+      "Bash(git push:*)"
     ]
   }
 }
