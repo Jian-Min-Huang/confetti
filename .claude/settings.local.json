@@ -4,7 +4,8 @@
       "Bash(swift build:*)",
       "Bash(make install:*)",
       "Bash(open:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git checkout:*)"
     ]
   }
 }

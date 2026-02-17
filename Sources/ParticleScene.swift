@@ -43,6 +43,7 @@ class ParticleScene: SKScene {
         case .confetti:      return ConfettiEffect(config: config, sceneSize: sceneSize)
         case .fireworks:     return FireworksEffect(config: config, sceneSize: sceneSize)
         case .fallingLeaves: return FallingLeavesEffect(config: config, sceneSize: sceneSize)
+        case .meteorShower:  return MeteorShowerEffect(config: config, sceneSize: sceneSize)
         }
     }
 }
