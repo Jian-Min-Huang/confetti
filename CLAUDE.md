@@ -44,7 +44,7 @@ AppDelegate
   ↓ for each screen, creates
 OverlayWindow + ParticleScene
   ↓ factory method creates
-ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect)
+ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect | MeteorShowerEffect | BubblesEffect)
 ```
 
 ### Key Design Patterns
@@ -115,7 +115,7 @@ Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 
 | Parameter    | Type             | Default    | Notes                                  |
 | ------------ | ---------------- | ---------- | -------------------------------------- |
-| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks    |
+| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks, meteor-shower, bubbles |
 | `--emojis`   | String of emojis | `🎉🎊✨`   | Parsed into array of single chars      |
 | `--density`  | `Density`        | `high`     | Maps to particleCount: 50/100/200      |
 | `--speed`    | Double           | `1.0`      | Animation speed multiplier             |
