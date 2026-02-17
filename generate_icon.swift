@@ -45,7 +45,7 @@ func savePNG(image: NSImage, path: String) -> Bool {
 }
 
 // Main
-let emoji = "🎆"
+let emoji = "🎉"
 let sizes: [CGFloat] = [16, 32, 64, 128, 256, 512, 1024]
 
 // Create iconset directory
