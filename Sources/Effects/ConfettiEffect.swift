@@ -10,11 +10,9 @@ final class ConfettiEffect: ParticleEffect {
 
     private struct Particle {
         let node: SKSpriteNode
-        var vx: CGFloat
+        let vx: CGFloat
         var vy: CGFloat
         let rotationSpeed: CGFloat
-        let spawnTime: TimeInterval
-        var isSpawned: Bool
     }
 
     // MARK: - State
@@ -35,13 +33,12 @@ final class ConfettiEffect: ParticleEffect {
     func setup(in scene: SKScene) {
         let textures = config.emojis.map { EmojiTexture.create(emoji: $0) }
         let count = config.density.particleCount
-        let spawnWindow = 0.0
 
         for i in 0..<count {
             let texture = textures[i % textures.count]
             let node = SKSpriteNode(texture: texture)
             node.setScale(CGFloat.random(in: 0.7...1.3))
-            node.alpha = 0  // hidden until spawn
+            node.alpha = 0
 
             let fromLeft = (i % 2 == 0)
             let startX: CGFloat = fromLeft ? -20 : sceneSize.width + 20
@@ -60,9 +57,7 @@ final class ConfettiEffect: ParticleEffect {
                 node: node,
                 vx: vx,
                 vy: vy,
-                rotationSpeed: CGFloat.random(in: -4...4),
-                spawnTime: Double.random(in: 0...spawnWindow),
-                isSpawned: false
+                rotationSpeed: CGFloat.random(in: -4...4)
             )
 
             scene.addChild(node)
@@ -80,14 +75,12 @@ final class ConfettiEffect: ParticleEffect {
         // FR-8: easing-based speed curve
         let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
         let speedCurve = config.easing.speedMultiplier(at: progress, exponent: CGFloat(config.easingExponent))
-        let adt = CGFloat(dt) * speed * speedCurve   // adjusted delta time
+        let adt = CGFloat(dt) * speed * speedCurve
         let gravity: CGFloat = 100
 
         for i in particles.indices {
-            // Spawn check
-            if !particles[i].isSpawned {
-                guard elapsed >= particles[i].spawnTime else { continue }
-                particles[i].isSpawned = true
+            // Reveal on first frame
+            if particles[i].node.alpha == 0 && elapsed < config.duration - 0.5 {
                 particles[i].node.alpha = 1
             }
 
@@ -100,8 +93,8 @@ final class ConfettiEffect: ParticleEffect {
             // Fade out near end
             let fadeStart = config.duration - 0.5
             if elapsed > fadeStart {
-                let progress = CGFloat((elapsed - fadeStart) / 0.5)
-                particles[i].node.alpha = max(0, 1 - progress)
+                let fadeProgress = CGFloat((elapsed - fadeStart) / 0.5)
+                particles[i].node.alpha = max(0, 1 - fadeProgress)
             }
 
             // Hide if below screen
