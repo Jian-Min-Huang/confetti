@@ -88,7 +88,7 @@ final class YourEffect: ParticleEffect {
     func update(currentTime: TimeInterval, deltaTime dt: TimeInterval) {
         // Apply easing-based speed curve:
         // let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
-        // let speedCurve = config.easing.speedMultiplier(at: progress)
+        // let speedCurve = config.easing.speedMultiplier(at: progress, exponent: CGFloat(config.easingExponent))
         // let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
         // Update particle physics/positions
         // Handle fade-out near config.duration
@@ -98,11 +98,11 @@ final class YourEffect: ParticleEffect {
 
 **Critical Implementation Details:**
 
-- Use `config.density.particleCount` for particle count (low: 50, medium: 100, high: 200)
+- Use `config.density.particleCount` for particle count (low: 100, medium: 200, high: 300)
 - Apply easing-based speed curve:
   ```swift
   let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
-  let speedCurve = config.easing.speedMultiplier(at: progress)
+  let speedCurve = config.easing.speedMultiplier(at: progress, exponent: CGFloat(config.easingExponent))
   let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
   ```
 - Create emoji textures with `EmojiTexture.create(emoji: String)`
@@ -117,7 +117,7 @@ Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 | ------------ | ---------------- | ---------- | -------------------------------------- |
 | `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks, meteor-shower, bubbles |
 | `--emojis`   | String of emojis | `🎉🎊✨`   | Parsed into array of single chars      |
-| `--density`  | `Density`        | `high`     | Maps to particleCount: 50/100/200      |
+| `--density`  | `Density`        | `medium`   | Maps to particleCount: 100/200/300     |
 | `--speed`    | Double           | `1.0`      | Animation speed multiplier             |
 | `--easing`   | `EasingType`     | `ease-out` | linear, ease-in, ease-out, ease-in-out |
 | `--duration` | Double           | `5.0`      | Auto-terminate after duration + 0.5s   |
@@ -148,47 +148,49 @@ DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
 **Confetti Effect** (Bug #2 fixed - arc flattened):
 
 - Launch gravity: 100 (was 400)
-- Target height: 50%-95% screen (was 70%-90%)
-- Velocity boost: 1.30-1.50x (was 0.95-1.05x)
-- Horizontal velocity: 100-1000 (was 500-900)
+- Target height: 30%-60% screen (was 70%-90%)
+- Velocity boost: 1.20-1.30x (was 0.95-1.05x)
+- Horizontal velocity: 30-300 (was 500-900)
 
 These create a flatter arc trajectory as specified in [BUG_zh.md](BUG_zh.md).
 
 ### Easing Functions (FR-8, FR-13, FR-19)
 
-Easing functions control the animation speed curve over time, making particle motion feel more natural. The implementation uses **speed multipliers** derived from the first derivative of standard easing curves.
+Easing functions control the animation speed curve over time, making particle motion feel more natural. The implementation provides two methods with a configurable exponent parameter.
 
-**Mathematical Implementation** ([Config.swift](Sources/Config.swift):23-38):
+**Two Methods** ([Config.swift](Sources/Config.swift)):
+
+1. `position(at:exponent:)` — Maps linear progress to eased position (used by FireworksEffect for rocket interpolation)
+2. `speedMultiplier(at:exponent:)` — First derivative of `position()`, returns speed multiplier (used by most effects)
+
+**Mathematical Implementation** (generalized with exponent `n`, default `n=2`):
 
 ```swift
-func speedMultiplier(at progress: CGFloat) -> CGFloat {
-    let t = min(max(progress, 0), 1)  // clamp to [0,1]
-    switch self {
-    case .linear:
-        return 1.0                     // constant speed
-    case .easeIn:
-        return 2.0 * t                 // f(t)=t²  → f'(t)=2t
-    case .easeOut:
-        return 2.0 * (1.0 - t)         // f(t)=2t−t² → f'(t)=2(1−t)
-    case .easeInOut:
-        return 6.0 * t * (1.0 - t)     // f(t)=3t²−2t³ → f'(t)=6t(1−t)
-    }
-}
+// position(at:exponent:) — eased position in [0,1]
+case .easeIn:    pow(t, n)                           // Slow start
+case .easeOut:   1.0 - pow(1.0 - t, n)               // Fast start
+case .easeInOut: t < 0.5 ? pow(2,n-1)·t^n : 1-pow(2,n-1)·(1-t)^n
+
+// speedMultiplier(at:exponent:) — first derivative
+case .easeIn:    n * pow(t, n - 1)                    // f(t)=tⁿ → f'(t)=n·t^(n−1)
+case .easeOut:   n * pow(1.0 - t, n - 1)              // f(t)=1−(1−t)ⁿ → f'(t)=n·(1−t)^(n−1)
+case .easeInOut: n·2^(n−1)·t^(n−1) or (1−t)^(n−1)    // Piecewise at t=0.5
 ```
 
-**Usage in Effects** (see [ConfettiEffect.swift](Sources/Effects/ConfettiEffect.swift):98-101):
+**Usage in Effects** (see [ConfettiEffect.swift](Sources/Effects/ConfettiEffect.swift):76-78):
 
 ```swift
 let progress = min(1.0, CGFloat(elapsed) / CGFloat(config.duration))
-let speedCurve = config.easing.speedMultiplier(at: progress)
+let speedCurve = config.easing.speedMultiplier(at: progress, exponent: CGFloat(config.easingExponent))
 let adt = CGFloat(dt) * CGFloat(config.speed) * speedCurve
 ```
 
 **Key Properties:**
 
 - All curves integrate to 1.0 over [0,1], preserving total animation distance
+- Exponent `n` controls curve intensity: 2=quadratic, 3=cubic (default `easingExponent`), higher=more extreme
 - `ease-out` (default) creates natural deceleration, ideal for settling effects
-- `ease-in-out` creates smooth acceleration/deceleration, used in both rocket launch and spark explosion phases in fireworks effect
+- FireworksEffect uses `position()` for rockets (direct interpolation) and `speedMultiplier()` for sparks
 
 ### Auto-Termination
 
@@ -199,8 +201,8 @@ App terminates via two mechanisms:
 
 ### Emoji Rendering
 
-- `EmojiTexture.create()` renders emoji strings to SKTexture using Core Text
-- Textures are cached per unique emoji
+- `EmojiTexture.create(emoji:size:)` renders emoji strings to SKTexture (default size: 36pt)
+- Textures are cached by `"{emoji}_{size}"` key — effects may use custom sizes (e.g., 28pt sparks, 32pt rockets, 40pt leaves)
 - Particle nodes use random scale (typically 0.7...1.3) for variety
 
 ## Code References
