@@ -1,5 +1,7 @@
 # Confetti
 
+Inspired by [Recast](https://www.loom.com/recast)'s confetti celebration effect, Confetti is a macOS native command-line tool that takes the idea further — offering more customizable parameters, a wider variety of visual styles, and a key improvement: it returns focus to your previously active window after the animation ends in Claude Code Hooks.
+
 - [CLAUDE.md](CLAUDE.md)
 
 ## Demo
