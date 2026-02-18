@@ -48,10 +48,16 @@ open Confetti.app --args --preset bubbles
 
 ![bubbles](./images/bubbles.gif)
 
+```bash
+open Confetti.app --args --preset sparkler
+```
+
+![sparkler](./images/sparkler.gif)
+
 Presets can be overridden with individual parameters:
 
 ```bash
 open Confetti.app --args --preset cherry --density high --speed 3.0
 ```
 
-> **Note:** The `snow` preset uses SpriteKit's built-in `SKEmitterNode` particle system. The `--easing` parameter has no effect on it. The `--density`, `--speed`, and `--duration` parameters still work but interact differently — see [CLAUDE.md](CLAUDE.md) for details.
+> **Note:** The `snow` and `sparkler` presets use SpriteKit's built-in `SKEmitterNode` particle system. The `--easing` parameter has no effect on them. The `--density`, `--speed`, and `--duration` parameters still work but interact differently — see [CLAUDE.md](CLAUDE.md) for details.
