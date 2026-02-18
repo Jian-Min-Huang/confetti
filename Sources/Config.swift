@@ -11,6 +11,7 @@ enum Preset: String {
     case fireworks
     case meteor
     case bubbles
+    case sparkler
 
     func apply(to config: inout Config) {
         switch self {
@@ -60,6 +61,13 @@ enum Preset: String {
             config.style = .bubbles
             config.emojis = ["🫧"]
             config.density = .low
+            config.speed = 1.0
+            config.easing = .linear
+            config.duration = 5.0
+        case .sparkler:
+            config.style = .sparkler
+            config.emojis = ["✨", "🌟", "💫"]
+            config.density = .high
             config.speed = 1.0
             config.easing = .linear
             config.duration = 5.0
