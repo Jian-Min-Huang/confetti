@@ -115,6 +115,7 @@ Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 
 | Parameter    | Type             | Default    | Notes                                  |
 | ------------ | ---------------- | ---------- | -------------------------------------- |
+| `--preset`   | `Preset`         | (none)     | Named presets; other params override   |
 | `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks, meteor-shower, bubbles |
 | `--emojis`   | String of emojis | `🎉🎊✨`   | Parsed into array of single chars      |
 | `--density`  | `Density`        | `medium`   | Maps to particleCount: 100/200/300     |
