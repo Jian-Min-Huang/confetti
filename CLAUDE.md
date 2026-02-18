@@ -44,7 +44,7 @@ AppDelegate
   ↓ for each screen, creates
 OverlayWindow + ParticleScene
   ↓ factory method creates
-ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect | MeteorShowerEffect | BubblesEffect)
+ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect | MeteorShowerEffect | BubblesEffect | SnowEffect)
 ```
 
 ### Key Design Patterns
@@ -64,9 +64,13 @@ ParticleEffect (ConfettiEffect | FireworksEffect | FallingLeavesEffect | MeteorS
   - Window uses `.borderless` style and `level = .screenSaver` to float above all apps (FR-3)
   - App uses `.accessory` activation policy to hide from Dock/menu bar (FR-2)
 
-### Effect Implementation Structure
+### Effect Implementation Approaches
 
-Each `ParticleEffect` should follow this pattern (see [ConfettiEffect.swift](Sources/Effects/ConfettiEffect.swift) as reference):
+There are two approaches to implementing effects in this project:
+
+#### Approach 1: Manual Particle Management (most effects)
+
+Manually create and update `SKSpriteNode` particles each frame. Offers full control over physics and easing. See [ConfettiEffect.swift](Sources/Effects/ConfettiEffect.swift) as reference:
 
 ```swift
 final class YourEffect: ParticleEffect {
@@ -109,6 +113,44 @@ final class YourEffect: ParticleEffect {
 - Fade particles near end: `if elapsed > config.duration - 0.5 { ... }`
 - Set initial `node.alpha = 0` to prevent flash, reveal on spawn
 
+#### Approach 2: SKEmitterNode Built-in Particle System (SnowEffect)
+
+Uses SpriteKit's built-in `SKEmitterNode` for automatic particle lifecycle management. See [SnowEffect.swift](Sources/Effects/SnowEffect.swift) as reference:
+
+```swift
+final class YourEmitterEffect: ParticleEffect {
+    private var emitters: [SKEmitterNode] = []
+
+    func setup(in scene: SKScene) {
+        // Create one SKEmitterNode per emoji texture
+        // Set emitter properties: particleBirthRate, particleSpeed, emissionAngle, etc.
+        // Use EmojiTexture.create() for particleTexture
+        // Add emitters to scene
+    }
+
+    func update(currentTime: TimeInterval, deltaTime dt: TimeInterval) {
+        // Minimal: only handle fade-out and stopping emission near duration end
+        // Physics are handled automatically by SpriteKit
+    }
+}
+```
+
+**SKEmitterNode Config Parameter Mapping:**
+
+| Config Parameter | SKEmitterNode Mapping | Notes |
+| --- | --- | --- |
+| `density` | `particleBirthRate` | Controls emission rate, not exact on-screen count |
+| `speed` | `particleSpeed` multiplier | Also affects `particleLifetime` |
+| `emojis` | One emitter per emoji | Each with `EmojiTexture.create()` texture |
+| `duration` | Stop emission + fade out | `particleBirthRate = 0` near end |
+| `easing` | **Not applicable** | Cannot control per-particle speed curves post-emission |
+| `easingExponent` | **Not applicable** | Depends on easing |
+
+**When to use which approach:**
+
+- **Manual** — When you need precise per-particle control, multi-phase behavior (e.g., fireworks: launch → explode → fall), or easing support
+- **SKEmitterNode** — When particles have uniform, continuous behavior (e.g., snowfall, rain) and you want simpler code with automatic particle recycling
+
 ## Configuration System
 
 Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
@@ -116,7 +158,7 @@ Command-line parameters (defined in [Config.swift](Sources/Config.swift)):
 | Parameter    | Type             | Default    | Notes                                  |
 | ------------ | ---------------- | ---------- | -------------------------------------- |
 | `--preset`   | `Preset`         | (none)     | Named presets; other params override   |
-| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks, meteor-shower, bubbles |
+| `--style`    | `EffectStyle`    | `confetti` | confetti, falling-leaves, fireworks, meteor-shower, bubbles, snow |
 | `--emojis`   | String of emojis | `🎉🎊✨`   | Parsed into array of single chars      |
 | `--density`  | `Density`        | `medium`   | Maps to particleCount: 100/200/300     |
 | `--speed`    | Double           | `1.0`      | Animation speed multiplier             |

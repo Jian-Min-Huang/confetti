@@ -36,10 +36,10 @@ enum Preset: String {
             config.easing = .linear
             config.duration = 5.0
         case .snow:
-            config.style = .fallingLeaves
+            config.style = .snow
             config.emojis = ["❄️", "☃️"]
-            config.density = .low
-            config.speed = 1.5
+            config.density = .high
+            config.speed = 2.5
             config.easing = .linear
             config.duration = 5.0
         case .fireworks:
@@ -75,6 +75,7 @@ enum EffectStyle: String {
     case fireworks
     case meteorShower = "meteor-shower"
     case bubbles
+    case snow
 }
 
 // MARK: - Easing Type (FR-8)
