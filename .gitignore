@@ -1,5 +1,10 @@
 .build/
+
+.claude/
+
+logs/
+
 Confetti.app
+
 AppIcon.icns
 AppIcon.iconset
-logs/
