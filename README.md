@@ -4,55 +4,20 @@
 
 ## Demo
 
+![demo](./Demo/demo.gif)
+
 Use `--preset` to quickly launch a preconfigured effect:
 
 ```bash
 open Confetti.app --args --preset confetti
-```
-
-![confetti](./images/confetti.gif)
-
-```bash
 open Confetti.app --args --preset cherry
-```
-
-![flower](./images/cherry.gif)
-
-```bash
 open Confetti.app --args --preset maple
-```
-
-![maple](./images/maple.gif)
-
-```bash
 open Confetti.app --args --preset snow
-```
-
-![snow](./images/snow.gif)
-
-```bash
 open Confetti.app --args --preset fireworks
-```
-
-![fireworks](./images/fireworks.gif)
-
-```bash
 open Confetti.app --args --preset meteor
-```
-
-![meteor](./images/meteor.gif)
-
-```bash
 open Confetti.app --args --preset bubbles
-```
-
-![bubbles](./images/bubbles.gif)
-
-```bash
 open Confetti.app --args --preset sparkler
 ```
-
-![sparkler](./images/sparkler.gif)
 
 Presets can be overridden with individual parameters:
 
