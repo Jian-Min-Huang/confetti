@@ -61,3 +61,11 @@ open Confetti.app --args --preset cherry --density high --speed 3.0
 ```
 
 > **Note:** The `snow` and `sparkler` presets use SpriteKit's built-in `SKEmitterNode` particle system. The `--easing` parameter has no effect on them. The `--density`, `--speed`, and `--duration` parameters still work but interact differently — see [CLAUDE.md](CLAUDE.md) for details.
+
+## Demo App
+
+Run the Demo app to see all 8 effects side by side in a 2×4 grid:
+
+```bash
+cd Demo && swift run
+```
