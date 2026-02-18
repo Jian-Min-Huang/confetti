@@ -64,7 +64,7 @@ open Confetti.app --args --preset cherry --density high --speed 3.0
 
 ## Demo App
 
-Run the Demo app to see all 8 effects side by side in a 2×4 grid:
+Run the Demo app to see all 8 effects in a 2-column × 4-row grid:
 
 ```bash
 cd Demo && swift run

@@ -5,11 +5,11 @@ class DemoAppDelegate: NSObject, NSApplicationDelegate {
     private var window: NSWindow!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        let rect = NSRect(x: 0, y: 0, width: 1200, height: 800)
+        let rect = NSRect(x: 0, y: 0, width: 800, height: 1000)
         window = NSWindow(contentRect: rect, styleMask: [.titled, .closable, .resizable, .miniaturizable], backing: .buffered, defer: false)
         window.title = "Confetti Demo"
         window.center()
-        window.minSize = NSSize(width: 800, height: 540)
+        window.minSize = NSSize(width: 600, height: 800)
 
         let container = DemoGridView(presets: DemoPreset.all)
         container.translatesAutoresizingMaskIntoConstraints = false

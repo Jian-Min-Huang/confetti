@@ -48,14 +48,14 @@ class DemoGridView: NSView {
 
         let padding: CGFloat = 12
         let labelHeight: CGFloat = 28
-        let cols = 4
-        let rows = 2
+        let cols = 2
+        let rows = 4
 
         let totalWidth = bounds.width - padding * CGFloat(cols + 1)
         let panelWidth = totalWidth / CGFloat(cols)
         let rowHeight = (bounds.height - padding * CGFloat(rows + 1)) / CGFloat(rows)
 
-        // 2 rows × 4 columns grid
+        // 2 columns × 4 rows grid
         for row in 0..<rows {
             for col in 0..<cols {
                 let index = row * cols + col
