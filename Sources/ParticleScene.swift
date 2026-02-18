@@ -46,6 +46,7 @@ class ParticleScene: SKScene {
         case .meteorShower:  return MeteorShowerEffect(config: config, sceneSize: sceneSize)
         case .bubbles:       return BubblesEffect(config: config, sceneSize: sceneSize)
         case .snow:          return SnowEffect(config: config, sceneSize: sceneSize)
+        case .sparkler:      return SparklerEffect(config: config, sceneSize: sceneSize)
         }
     }
 }

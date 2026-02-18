@@ -76,6 +76,7 @@ enum EffectStyle: String {
     case meteorShower = "meteor-shower"
     case bubbles
     case snow
+    case sparkler
 }
 
 // MARK: - Easing Type (FR-8)
