@@ -54,7 +54,7 @@ enum Preset: String {
             config.emojis = ["⭐"]
             config.density = .low
             config.speed = 2.0
-            config.easing = .easeIn
+            config.easing = .linear
             config.duration = 5.0
         case .bubbles:
             config.style = .bubbles

@@ -58,13 +58,22 @@ final class MeteorShowerEffect: ParticleEffect {
             headNode.setScale(CGFloat.random(in: 0.7...1.3))
             headNode.alpha = 0
 
-            // Spawn from right side or top of screen
-            let startX = sceneSize.width + CGFloat.random(in: 20...100)
-            let startY = sceneSize.height * CGFloat.random(in: 0.6...1.0) + CGFloat.random(in: 0...80)
+            // Spawn from right edge or top edge of the upper-right quadrant
+            let startX: CGFloat
+            let startY: CGFloat
+            if Bool.random() {
+                // From right edge — Y spans upper half
+                startX = sceneSize.width + CGFloat.random(in: 20...100)
+                startY = sceneSize.height * CGFloat.random(in: 0.3...1.0) + CGFloat.random(in: 0...40)
+            } else {
+                // From top edge — X spans from center to right
+                startX = sceneSize.width * CGFloat.random(in: 0.3...1.0) + CGFloat.random(in: 0...40)
+                startY = sceneSize.height + CGFloat.random(in: 20...100)
+            }
             headNode.position = CGPoint(x: startX, y: startY)
 
-            // Angle: 15°–35° below horizontal (shallow diagonal toward lower-left)
-            let angle = CGFloat.random(in: 15...35) * .pi / 180
+            // Angle: 25°–35° below horizontal (consistent shallow diagonal)
+            let angle = CGFloat.random(in: 25...35) * .pi / 180
             let speed = CGFloat.random(in: 800...1500)
             let vx = -cos(angle) * speed
             let vy = -sin(angle) * speed
