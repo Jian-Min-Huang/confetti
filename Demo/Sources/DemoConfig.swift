@@ -10,6 +10,7 @@ enum EffectStyle: String {
     case meteorShower = "meteor-shower"
     case bubbles
     case snow
+    case sparkler
 }
 
 // MARK: - Easing Type
@@ -145,6 +146,14 @@ struct DemoPreset {
             style: .bubbles,
             emojis: ["🫧"],
             density: .low,
+            speed: 1.0,
+            easing: .linear,
+            duration: 5.0
+        )),
+        DemoPreset(title: "Sparkler", config: Config(
+            style: .sparkler,
+            emojis: ["✨", "🌟", "💫"],
+            density: .high,
             speed: 1.0,
             easing: .linear,
             duration: 5.0

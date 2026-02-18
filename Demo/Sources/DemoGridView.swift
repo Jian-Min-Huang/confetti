@@ -48,29 +48,23 @@ class DemoGridView: NSView {
 
         let padding: CGFloat = 12
         let labelHeight: CGFloat = 28
-        let topCount = 4
-        let bottomCount = 3
+        let cols = 4
+        let rows = 2
 
-        let totalWidth = bounds.width - padding * CGFloat(topCount + 1)
-        let panelWidth = totalWidth / CGFloat(topCount)
-        let rowHeight = (bounds.height - padding * 3) / 2.0
+        let totalWidth = bounds.width - padding * CGFloat(cols + 1)
+        let panelWidth = totalWidth / CGFloat(cols)
+        let rowHeight = (bounds.height - padding * CGFloat(rows + 1)) / CGFloat(rows)
 
-        // Top row: 4 panels
-        for i in 0..<topCount {
-            let x = padding + CGFloat(i) * (panelWidth + padding)
-            let y = bounds.height - padding - rowHeight
-            let frame = NSRect(x: x, y: y, width: panelWidth, height: rowHeight)
-            layoutPanel(at: i, frame: frame, labelHeight: labelHeight)
-        }
-
-        // Bottom row: 3 panels centered
-        let bottomTotalWidth = CGFloat(bottomCount) * panelWidth + CGFloat(bottomCount - 1) * padding
-        let bottomStartX = (bounds.width - bottomTotalWidth) / 2.0
-        for i in 0..<bottomCount {
-            let x = bottomStartX + CGFloat(i) * (panelWidth + padding)
-            let y = padding
-            let frame = NSRect(x: x, y: y, width: panelWidth, height: rowHeight)
-            layoutPanel(at: topCount + i, frame: frame, labelHeight: labelHeight)
+        // 2 rows × 4 columns grid
+        for row in 0..<rows {
+            for col in 0..<cols {
+                let index = row * cols + col
+                guard index < panels.count else { continue }
+                let x = padding + CGFloat(col) * (panelWidth + padding)
+                let y = bounds.height - padding - CGFloat(row + 1) * (rowHeight + padding) + padding
+                let frame = NSRect(x: x, y: y, width: panelWidth, height: rowHeight)
+                layoutPanel(at: index, frame: frame, labelHeight: labelHeight)
+            }
         }
 
         // Re-present scenes if size changed significantly
