@@ -1,6 +1,72 @@
 import Foundation
 import CoreGraphics
 
+// MARK: - Preset
+
+enum Preset: String {
+    case confetti
+    case cherry
+    case maple
+    case snow
+    case fireworks
+    case meteor
+    case bubbles
+
+    func apply(to config: inout Config) {
+        switch self {
+        case .confetti:
+            config.style = .confetti
+            config.emojis = ["🎉", "🎁", "🍬"]
+            config.density = .medium
+            config.speed = 5.0
+            config.easing = .linear
+            config.duration = 2.5
+        case .cherry:
+            config.style = .fallingLeaves
+            config.emojis = ["🌸"]
+            config.density = .low
+            config.speed = 1.5
+            config.easing = .linear
+            config.duration = 5.0
+        case .maple:
+            config.style = .fallingLeaves
+            config.emojis = ["🍂", "🍁"]
+            config.density = .low
+            config.speed = 1.5
+            config.easing = .linear
+            config.duration = 5.0
+        case .snow:
+            config.style = .fallingLeaves
+            config.emojis = ["❄️", "☃️"]
+            config.density = .low
+            config.speed = 1.5
+            config.easing = .linear
+            config.duration = 5.0
+        case .fireworks:
+            config.style = .fireworks
+            config.emojis = ["⭐", "🌟", "💫", "💥", "✨", "🔸", "🔹"]
+            config.density = .high
+            config.speed = 1.0
+            config.easing = .easeOut
+            config.duration = 5.0
+        case .meteor:
+            config.style = .meteorShower
+            config.emojis = ["⭐"]
+            config.density = .low
+            config.speed = 2.0
+            config.easing = .easeIn
+            config.duration = 5.0
+        case .bubbles:
+            config.style = .bubbles
+            config.emojis = ["🫧"]
+            config.density = .low
+            config.speed = 1.0
+            config.easing = .linear
+            config.duration = 5.0
+        }
+    }
+}
+
 // MARK: - Effect Style (FR-7)
 
 enum EffectStyle: String {
@@ -107,9 +173,22 @@ struct Config {
     static func parse() -> Config {
         var config = Config()
         let args = CommandLine.arguments
+
+        // Pass 1: Apply preset if specified
+        for j in 1..<args.count {
+            if args[j] == "--preset", j + 1 < args.count,
+               let preset = Preset(rawValue: args[j + 1]) {
+                preset.apply(to: &config)
+                break
+            }
+        }
+
+        // Pass 2: Parse individual parameters (overrides preset values)
         var i = 1
         while i < args.count {
             switch args[i] {
+            case "--preset":
+                i += 2  // skip, already handled in pass 1
             case "--style":
                 if i + 1 < args.count {
                     config.style = EffectStyle(rawValue: args[i + 1]) ?? .confetti
