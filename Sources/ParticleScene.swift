@@ -8,6 +8,7 @@ class ParticleScene: SKScene {
     private var effect: ParticleEffect?
     private var lastUpdateTime: TimeInterval = 0
     private var firstUpdate = true
+    var onFirstFrameRendered: (() -> Void)?
 
     init(size: CGSize, config: Config) {
         self.config = config
@@ -34,6 +35,13 @@ class ParticleScene: SKScene {
         // Clamp dt to avoid huge jumps on first frame or lag spikes
         let clampedDt = min(dt, 1.0 / 30.0)
         effect?.update(currentTime: currentTime, deltaTime: clampedDt)
+    }
+
+    override func didFinishUpdate() {
+        if let callback = onFirstFrameRendered {
+            callback()
+            onFirstFrameRendered = nil
+        }
     }
 
     // MARK: - Factory (NFR-5)

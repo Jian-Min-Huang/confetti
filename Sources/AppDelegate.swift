@@ -15,6 +15,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // FR-5: Create overlay window for each screen
+        var pendingScenes = NSScreen.screens.count
         for screen in NSScreen.screens {
             let window = OverlayWindow(for: screen)
 
@@ -25,16 +26,20 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
             let scene = ParticleScene(size: screen.frame.size, config: config)
             scene.scaleMode = .resizeFill
+
+            // Reveal windows only after all scenes complete their first render (Bug #1)
+            scene.onFirstFrameRendered = { [weak self] in
+                pendingScenes -= 1
+                if pendingScenes == 0 {
+                    self?.windows.forEach { $0.alphaValue = 1 }
+                }
+            }
+
             skView.presentScene(scene)
 
             window.alphaValue = 0          // Start hidden to avoid initial flash
             window.orderFrontRegardless()
             windows.append(window)
-        }
-
-        // Reveal windows after first frame renders to avoid flash (Bug #1)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
-            self?.windows.forEach { $0.alphaValue = 1 }
         }
 
         // Activate to receive keyboard events
