@@ -8,7 +8,8 @@ class ParticleScene: SKScene {
     private var effect: ParticleEffect?
     private var lastUpdateTime: TimeInterval = 0
     private var firstUpdate = true
-    var onFirstFrameRendered: (() -> Void)?
+    private var renderedFrameCount = 0
+    var onReadyToShow: (() -> Void)?
 
     init(size: CGSize, config: Config) {
         self.config = config
@@ -38,9 +39,14 @@ class ParticleScene: SKScene {
     }
 
     override func didFinishUpdate() {
-        if let callback = onFirstFrameRendered {
-            callback()
-            onFirstFrameRendered = nil
+        // Wait until 3 frames have been processed so the GPU has fully rendered
+        // at least 2 frames before revealing the window (Bug #1: avoid initial flash)
+        if let callback = onReadyToShow {
+            renderedFrameCount += 1
+            if renderedFrameCount >= 3 {
+                callback()
+                onReadyToShow = nil
+            }
         }
     }
 

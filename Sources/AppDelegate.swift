@@ -27,8 +27,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let scene = ParticleScene(size: screen.frame.size, config: config)
             scene.scaleMode = .resizeFill
 
-            // Reveal windows only after all scenes complete their first render (Bug #1)
-            scene.onFirstFrameRendered = { [weak self] in
+            // Reveal windows only after all scenes have rendered enough frames (Bug #1)
+            scene.onReadyToShow = { [weak self] in
                 pendingScenes -= 1
                 if pendingScenes == 0 {
                     self?.windows.forEach { $0.alphaValue = 1 }
